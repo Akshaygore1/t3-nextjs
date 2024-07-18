@@ -4,6 +4,8 @@ import Link from "next/link";
 import { InputField } from "./ui/input";
 import { obfuscateEmail } from "../../lib/utils";
 import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
+import toast from "react-hot-toast";
 
 interface VerifyOtpProps {
   mail: string;
@@ -12,6 +14,30 @@ interface VerifyOtpProps {
 export const VerifyOtp: React.FC<VerifyOtpProps> = ({ mail }) => {
   const router = useRouter();
   const [otp, setOtp] = useState<string[]>(new Array(8).fill(""));
+  const utils = api.useUtils();
+  const [verificationStatus, setVerificationStatus] = useState<
+    "idle" | "verifying" | "success" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const verifyOtp = api.auth.verifyOtp.useMutation({
+    onMutate: () => {
+      setVerificationStatus("verifying");
+    },
+    onSuccess: (data) => {
+      console.log("OTP verified successfully:", data);
+      void utils.auth.invalidate();
+      setVerificationStatus("success");
+      toast.success("OTP verified successfully!");
+      setTimeout(() => router.push("/login"), 2000);
+    },
+    onError: (error) => {
+      console.error("Error verifying OTP:", error);
+      setVerificationStatus("error");
+      setErrorMessage(error.message);
+      toast.error(error.message);
+    },
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -48,8 +74,10 @@ export const VerifyOtp: React.FC<VerifyOtpProps> = ({ mail }) => {
     e.preventDefault();
     const otpValue = otp.join("");
     console.log("OTP submitted:", otpValue);
-    router.push(`/login`);
-    // Add your OTP verification logic here
+    verifyOtp.mutate({
+      email: mail,
+      otp: otpValue,
+    });
   };
 
   return (
@@ -73,14 +101,31 @@ export const VerifyOtp: React.FC<VerifyOtpProps> = ({ mail }) => {
               onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               className="h-12 w-12 rounded-md border-2 border-gray-300 text-center text-xl font-semibold focus:border-black focus:outline-none"
+              disabled={
+                verificationStatus === "verifying" ||
+                verificationStatus === "success"
+              }
             />
           ))}
         </div>
+        {verificationStatus === "error" && (
+          <div className="text-center text-sm text-red-500">{errorMessage}</div>
+        )}
+        {verificationStatus === "success" && (
+          <div className="text-center text-sm text-green-500">
+            OTP verified successfully! Redirecting to login...
+          </div>
+        )}
         <button
           type="submit"
           className="w-full rounded-md bg-black py-3 text-base font-medium uppercase text-white disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={
+            verificationStatus === "verifying" ||
+            verificationStatus === "success" ||
+            otp.some((digit) => digit === "")
+          }
         >
-          Verify OTP
+          {verificationStatus === "verifying" ? "Verifying..." : "Verify OTP"}
         </button>
         <div className="text-center text-sm text-[#333333]">
           Don&apos;t have an Account?

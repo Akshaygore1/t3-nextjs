@@ -6,6 +6,7 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { Navbar } from "./_components/navbar";
 import { Topbar } from "./_components/topbar";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -22,6 +23,16 @@ export default function RootLayout({
         <TRPCReactProvider>
           <Topbar />
           <Navbar />
+          <Toaster
+            toastOptions={{
+              className: "",
+              style: {
+                background: "#000000",
+                color: "#fff",
+              },
+              position: "bottom-left",
+            }}
+          />{" "}
           {children}
         </TRPCReactProvider>
       </body>

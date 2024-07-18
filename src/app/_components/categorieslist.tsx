@@ -3,7 +3,7 @@
 import { api } from "@/trpc/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function CategoryList({
   data,
@@ -15,15 +15,20 @@ export function CategoryList({
   };
   currentPage: number;
 }) {
-  const userId = 1;
+  const userId = 1; // Replace with the actual user ID from your auth logic
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   const {
     data: userCategories,
     isLoading: isLoadingUserCategories,
     isError: isErrorUserCategories,
-    refetch: refetchUserCategories,
   } = api.category.getCategoriesByUser.useQuery({ userId });
+
+  useEffect(() => {
+    if (userCategories && !isLoadingUserCategories && !isErrorUserCategories) {
+      setSelectedCategories(userCategories);
+    }
+  }, [userCategories, isLoadingUserCategories, isErrorUserCategories]);
 
   const handleCheckboxChange = (categoryId: number) => {
     setSelectedCategories((prevSelected) =>
@@ -47,11 +52,7 @@ export function CategoryList({
             <input
               type="checkbox"
               value={category.name}
-              checked={
-                userCategories &&
-                userCategories?.length > 0 &&
-                userCategories?.includes(category.id)
-              }
+              checked={selectedCategories.includes(category.id)}
               onChange={() => handleCheckboxChange(category.id)}
               className="form-checkbox custom-checkbox h-5 w-5 rounded-md border-2 border-black text-black accent-black checked:bg-black"
             />
@@ -62,9 +63,7 @@ export function CategoryList({
       <div className="mt-10 flex w-full items-center justify-between">
         <Link
           href={`/home/?page=${Math.max(currentPage - 1, 1)}`}
-          className={`rounded bg-black px-4 py-2 text-white ${
-            currentPage === 1 ? "pointer-events-none opacity-50" : ""
-          }`}
+          className={`rounded bg-black px-4 py-2 text-white ${currentPage === 1 ? "pointer-events-none opacity-50" : ""}`}
         >
           <ChevronLeft />
         </Link>
@@ -73,11 +72,7 @@ export function CategoryList({
         </span>
         <Link
           href={`/home/?page=${Math.min(currentPage + 1, data.totalPages)}`}
-          className={`rounded bg-black px-4 py-2 text-white ${
-            currentPage === data.totalPages
-              ? "pointer-events-none opacity-50"
-              : ""
-          }`}
+          className={`rounded bg-black px-4 py-2 text-white ${currentPage === data.totalPages ? "pointer-events-none opacity-50" : ""}`}
         >
           <ChevronRight />
         </Link>

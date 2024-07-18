@@ -11,3 +11,8 @@ export function obfuscateEmail(email: string): string {
 
   return `${obfuscatedLocalPart}@${domain}`;
 }
+
+export function generateOtp(): string {
+  const otp = Math.floor(10000000 + Math.random() * 90000000); // Ensure 8 digits
+  return otp.toString();
+}

@@ -3,9 +3,12 @@ import React, { useState, type ChangeEvent, type FocusEvent } from "react";
 import Link from "next/link";
 import { InputField } from "./ui/input";
 import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
+import toast from "react-hot-toast";
 
 export const Signup = () => {
   const router = useRouter();
+  const utils = api.useUtils();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -34,6 +37,19 @@ export const Signup = () => {
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return passwordRegex.test(password);
   };
+
+  const createUser = api.auth.userSignUp.useMutation({
+    onSuccess: (data) => {
+      console.log("User created successfully:", data);
+      void utils.auth.invalidate();
+      router.push(`/verify-otp/${formData.email}`);
+    },
+    onError: (error) => {
+      void utils.auth.invalidate();
+      console.error("Error creating user:", error.message);
+      toast.error(error.message);
+    },
+  });
 
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,20 +89,17 @@ export const Signup = () => {
     const isValid = Object.values(newErrors).every((error) => error === "");
 
     if (isValid) {
-      // Submit the form
-      // console.log("Form submitted:", formData);
-
-      // router.push("/verify-otp");
       try {
         console.log("Form submitted:", formData);
+        await createUser.mutateAsync({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        });
 
-        // Simulating an asynchronous operation (e.g., API call)
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Navigate to the next page
-        router.push(`/verify-otp/${formData.email}`);
+        setTimeout(() => router.push(`/verify-otp/${formData.email}`), 2000);
       } catch (error) {
-        console.error(error);
+        console.error("---", error);
       }
     }
   };

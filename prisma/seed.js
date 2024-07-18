@@ -3,31 +3,18 @@ import { faker } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
 
-async function seedUserCategories() {
-  const user1 = await prisma.user.findUnique({ where: { username: "user1" } });
-  const user2 = await prisma.user.findUnique({ where: { username: "user2" } });
-
-  if (user1 && user2) {
-    const categories = await prisma.category.findMany();
-
-    const userCategories = [
-      ...categories
-        .slice(0, 10)
-        .map((category) => ({ userId: user1.id, categoryId: category.id })),
-      ...categories
-        .slice(10, 20)
-        .map((category) => ({ userId: user2.id, categoryId: category.id })),
-    ];
-
-    await prisma.userCategory.createMany({
-      data: userCategories,
+async function seedCategories() {
+  for (let i = 0; i < 100; i++) {
+    const category = await prisma.category.create({
+      data: {
+        name: faker.commerce.productName(),
+      },
     });
-
-    console.log("User categories seeded successfully");
+    console.log("Category created:", category);
   }
 }
 
-seedUserCategories()
+seedCategories()
   .then(() => {
     console.log("Seeding complete");
   })

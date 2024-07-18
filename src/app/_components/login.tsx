@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { InputField } from "./ui/input";
 import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
+import toast from "react-hot-toast";
 
 export const Login = () => {
   const router = useRouter();
@@ -13,6 +15,18 @@ export const Login = () => {
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+  });
+
+  const loginMutation = api.auth.login.useMutation({
+    onSuccess: (data) => {
+      toast.success("Login successful!");
+      localStorage.setItem("authToken", data.token);
+      setInterval(() => router.push("/home"), 2000);
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
+      toast.error(error.message);
+    },
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,12 +75,10 @@ export const Login = () => {
 
     if (Object.values(newErrors).every((error) => error === "")) {
       console.log("Form submitted:", formData);
-      if (
-        "akshaygore789@gmail.com" === formData.email &&
-        "Akshay@123" === formData.password
-      ) {
-        router.push(`/home`);
-      }
+      loginMutation.mutate({
+        email: formData.email,
+        password: formData.password,
+      });
     }
   };
 
