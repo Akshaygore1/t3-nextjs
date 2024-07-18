@@ -11,7 +11,7 @@ const navItems = [
 
 export const Navbar = () => {
   return (
-    <div className="flex items-center justify-between p-4">
+    <div className="flex h-16 items-center justify-between px-4">
       <div className="flex items-center">
         <h1 className="ml-3 text-3xl font-bold">ECOMMERCE</h1>
       </div>
@@ -25,10 +25,10 @@ export const Navbar = () => {
         ))}
       </div>
       <div className="hidden items-center sm:ml-6 sm:flex sm:items-center">
-        <div className="flex h-8 w-8 items-center">
+        <div className="mr-8 flex h-8 w-8 items-center">
           <Search width={20} height={20} />
         </div>
-        <div className="h8 flex w-8 items-center">
+        <div className="h8 w-8">
           <ShoppingCart width={20} height={20} />
         </div>
       </div>

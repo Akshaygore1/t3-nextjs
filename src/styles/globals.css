@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input[type="checkbox"]:checked {
+  background-color: black; /* Ensure background is black */
+  border-color: black; /* Ensure border is black */
+}
