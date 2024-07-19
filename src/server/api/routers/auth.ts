@@ -175,6 +175,8 @@ export const authRouter = createTRPCRouter({
         },
       );
 
+      ctx.resHeaders.set("Set-Cookie", `token=${token}`);
+
       return { success: true, token };
     }),
 });
