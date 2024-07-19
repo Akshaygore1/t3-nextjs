@@ -19,9 +19,12 @@ const createContext = cache(() => {
 
   return createTRPCContext({
     resHeaders: heads,
-    req: new NextRequest("", {
-      headers: heads,
-    }),
+    req: new NextRequest(
+      process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
+      {
+        headers: heads,
+      },
+    ),
   });
 });
 
