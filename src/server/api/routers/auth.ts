@@ -3,10 +3,10 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import bcrypt from "bcrypt";
-import { generateOtp } from "@/lib/utils";
 import { TRPCError } from "@trpc/server";
 import jwt from "jsonwebtoken";
 import { setCookies } from "@/lib/auth";
+import { generateOtp } from "@/lib/otpUtils";
 
 export const authRouter = createTRPCRouter({
   hello: publicProcedure

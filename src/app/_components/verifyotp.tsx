@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { InputField } from "./ui/input";
-import { obfuscateEmail } from "../../lib/utils";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import toast from "react-hot-toast";
+import { obfuscateEmail } from "@/lib/otpUtils";
 
 interface VerifyOtpProps {
   mail: string;

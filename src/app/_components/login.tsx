@@ -21,7 +21,8 @@ export const Login = () => {
     onSuccess: (data) => {
       toast.success("Login successful!");
       localStorage.setItem("authToken", data.token);
-      setInterval(() => router.push("/home"), 2000);
+      router.refresh();
+      setInterval(() => router.push("/home/1"), 1000);
     },
     onError: (error) => {
       console.error("Login error:", error);

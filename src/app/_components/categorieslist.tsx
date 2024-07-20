@@ -24,12 +24,11 @@ export function CategoryList({
     isLoading: isLoadingUserCategories,
     isError: isErrorUserCategories,
   } = api.category.getCategoriesByUser.useQuery({ userId });
-
   useEffect(() => {
-    if (userCategories && !isLoadingUserCategories && !isErrorUserCategories) {
+    if (userCategories) {
       setSelectedCategories(userCategories);
     }
-  }, [userCategories, isLoadingUserCategories, isErrorUserCategories]);
+  }, [userCategories, userId]);
 
   const handleCheckboxChange = (categoryId: number) => {
     setSelectedCategories((prevSelected) =>
@@ -63,7 +62,7 @@ export function CategoryList({
       </div>
       <div className="mt-10 flex w-full items-center justify-between">
         <Link
-          href={`/home/?page=${Math.max(currentPage - 1, 1)}`}
+          href={`/home/${Math.max(currentPage - 1, 1)}`}
           className={`rounded bg-black px-4 py-2 text-white ${currentPage === 1 ? "pointer-events-none opacity-50" : ""}`}
         >
           <ChevronLeft />
@@ -72,7 +71,7 @@ export function CategoryList({
           Page {currentPage} of {data.totalPages}
         </span>
         <Link
-          href={`/home/?page=${Math.min(currentPage + 1, data.totalPages)}`}
+          href={`/home/${Math.min(currentPage + 1, data.totalPages)}`}
           className={`rounded bg-black px-4 py-2 text-white ${currentPage === data.totalPages ? "pointer-events-none opacity-50" : ""}`}
         >
           <ChevronRight />
