@@ -2,7 +2,9 @@ import React from "react";
 import { Banner } from "../../_components/banner";
 import { api } from "@/trpc/server";
 import { CategoryList } from "@/app/_components/categorieslist";
-
+import { isAuthenticated } from "@/lib/utils";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 const ITEMS_PER_PAGE = 6;
 
 export default async function Home({
@@ -10,9 +12,21 @@ export default async function Home({
 }: {
   searchParams: { page?: string };
 }) {
+  const auth = await isAuthenticated();
+  console.log("AUTH", auth);
+  if (!auth) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center p-48 text-black">
+        <h1 className="py-8 text-3xl font-semibold">
+          Please login to continue
+        </h1>
+        <Link href="/login">Sign in</Link>
+      </div>
+    );
+  }
+
   const currentPage = Number(searchParams.page) || 1;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const data = await api.category.getPaginatedCategories({
     page: currentPage,
     itemsPerPage: ITEMS_PER_PAGE,
@@ -28,7 +42,11 @@ export default async function Home({
               Please mark your interests!
             </h1>
             <p className="mb-6 text-center">We will keep you notified.</p>
-            <CategoryList data={data} currentPage={currentPage} />
+            <CategoryList
+              data={data}
+              currentPage={currentPage}
+              userId={auth.userId}
+            />
           </div>
         </div>
       </div>

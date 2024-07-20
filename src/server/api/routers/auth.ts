@@ -4,9 +4,9 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import bcrypt from "bcrypt";
 import { generateOtp } from "@/lib/utils";
-import { verify } from "crypto";
 import { TRPCError } from "@trpc/server";
 import jwt from "jsonwebtoken";
+import { setCookies } from "@/lib/auth";
 
 export const authRouter = createTRPCRouter({
   hello: publicProcedure
@@ -175,7 +175,7 @@ export const authRouter = createTRPCRouter({
         },
       );
 
-      ctx.resHeaders.set("Set-Cookie", `token=${token}`);
+      await setCookies(token);
 
       return { success: true, token };
     }),

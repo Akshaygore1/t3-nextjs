@@ -8,14 +8,15 @@ import { useState, useEffect } from "react";
 export function CategoryList({
   data,
   currentPage,
+  userId,
 }: {
   data: {
     categories: { id: number; name: string }[];
     totalPages: number;
   };
   currentPage: number;
+  userId: number;
 }) {
-  const userId = 1; // Replace with the actual user ID from your auth logic
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   const {
