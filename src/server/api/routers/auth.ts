@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import jwt from "jsonwebtoken";
 import { setCookies } from "@/lib/auth";
 import { generateOtp } from "@/lib/otpUtils";
+import { sendMail } from "@/lib/utils";
 
 export const authRouter = createTRPCRouter({
   hello: publicProcedure
@@ -39,7 +40,6 @@ export const authRouter = createTRPCRouter({
         });
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const hashedPassword: string = await bcrypt.hash(password, 10);
       const otp = generateOtp();
       const otpExpiry = new Date();
@@ -54,6 +54,7 @@ export const authRouter = createTRPCRouter({
           otpExpiry,
         },
       });
+      await sendMail(email, otp);
       console.log(user);
       return {
         success: true,
